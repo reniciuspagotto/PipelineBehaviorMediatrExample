@@ -26,13 +26,7 @@ namespace PipelineBehaviorMediatrExample.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(Assembly.Load);
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(FailFastBehaviorValidator<,>));
-            services.AddMediatR(assemblies.ToArray());
-
-            AddMediatr(services);
-
             services
                 .AddControllers()
                 .AddFluentValidation(opt =>
@@ -40,6 +34,8 @@ namespace PipelineBehaviorMediatrExample.Api
                     var assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(Assembly.Load);
                     opt.RegisterValidatorsFromAssemblies(assemblies);
                 });
+
+            AddMediatr(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -50,9 +46,7 @@ namespace PipelineBehaviorMediatrExample.Api
             }
 
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
